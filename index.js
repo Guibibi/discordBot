@@ -85,13 +85,18 @@ client.on('message', (message) => {
 });
 
 client.on('voiceStateUpdate', async (oldMember, newMember) => {
+	// Check if the user has joined the Main voice channel
+	if (newMember.channelID === null) return;
+
+	// Check if this is our main channel
 	if (newMember.channelID === config.voiceid) {
-		const id = newMember.id;
+		const id = newMember.id.toString(); //User id
+		const sound = playLoginSound(id);
+
+		if (sound === null || sound === undefined) return;
+
 		const connection = await newMember.member.voice.channel.join();
-		var dispatcher = connection.play('./audio/calis.mp3');
-		if (id.toString() === '358868084695498752') {
-			console.log('Guibibi has logged in');
-		}
+		var dispatcher = connection.play(`./audio/${sound.sound}`, { volume: sound.volume });
 	}
 
 	// Error handling when user leave voice channel
@@ -111,3 +116,14 @@ client.on('voiceStateUpdate', async (oldMember, newMember) => {
 
 // Login the bot
 client.login(config.token).catch((err) => console.log(err));
+
+function playLoginSound(id) {
+	const sounds = [
+		{ id: '429092662746808331', sound: 'vincent.mp3', volume: 1 },
+		{ id: '358868084695498752', sound: 'guibibi.mp3', volume: 0.2 },
+		{ id: '421398629916344320', sound: 'marco.mp3', volume: 0.5 },
+		{ id: '196000503249764363', sound: 'zigun.mp3', volume: 0.5 },
+		{ id: '112576800223154176', sound: 'dje.mp3', volume: 0.5 }
+	];
+	return sounds.find((o) => o.id === id);
+}
