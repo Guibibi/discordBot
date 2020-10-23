@@ -1,3 +1,4 @@
+const ffmepg = require('@discordjs/opus');
 const config = require('./config.json');
 const Discord = require('discord.js');
 const prefix = config.prefix;
@@ -81,6 +82,31 @@ client.on('message', (message) => {
 		console.error(error);
 		message.reply('there was an error trying to execute that command!');
 	}
+});
+
+client.on('voiceStateUpdate', async (oldMember, newMember) => {
+	if (newMember.channelID === config.voiceid) {
+		const id = newMember.id;
+		const connection = await newMember.member.voice.channel.join();
+		var dispatcher = connection.play('./audio/calis.mp3');
+		if (id.toString() === '358868084695498752') {
+			console.log('Guibibi has logged in');
+		}
+	}
+
+	// Error handling when user leave voice channel
+	if (dispatcher === null || dispatcher === undefined) return;
+
+	dispatcher.on('start', () => {
+		console.log('audio.mp3 is now playing!');
+	});
+
+	dispatcher.on('finish', () => {
+		dispatcher.destroy();
+	});
+
+	// Always remember to handle errors appropriately!
+	dispatcher.on('error', console.error);
 });
 
 // Login the bot
