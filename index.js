@@ -85,33 +85,36 @@ client.on('message', (message) => {
 });
 
 client.on('voiceStateUpdate', async (oldMember, newMember) => {
+	let newUserChannel = newMember.channelID;
+	let oldUserChannel = oldMember.channelID;
+	console.log(oldUserChannel, newUserChannel);
 	// Check if the user has joined the Main voice channel
-	if (newMember.channelID === null) return;
+	if (oldUserChannel === null && newUserChannel !== null) {
+		// Check if this is our main channel
+		if (newMember.channelID === config.voiceid) {
+			const id = newMember.id.toString(); //User id
+			const sound = playLoginSound(id);
 
-	// Check if this is our main channel
-	if (newMember.channelID === config.voiceid) {
-		const id = newMember.id.toString(); //User id
-		const sound = playLoginSound(id);
+			if (sound === null || sound === undefined) return;
 
-		if (sound === null || sound === undefined) return;
+			const connection = await newMember.member.voice.channel.join();
+			var dispatcher = connection.play(`./audio/${sound.sound}`, { volume: sound.volume });
+		}
 
-		const connection = await newMember.member.voice.channel.join();
-		var dispatcher = connection.play(`./audio/${sound.sound}`, { volume: sound.volume });
+		// Error handling when user leave voice channel
+		if (dispatcher === null || dispatcher === undefined) return;
+
+		dispatcher.on('start', () => {
+			console.log('audio.mp3 is now playing!');
+		});
+
+		dispatcher.on('finish', () => {
+			dispatcher.destroy();
+		});
+
+		// Always remember to handle errors appropriately!
+		dispatcher.on('error', console.error);
 	}
-
-	// Error handling when user leave voice channel
-	if (dispatcher === null || dispatcher === undefined) return;
-
-	dispatcher.on('start', () => {
-		console.log('audio.mp3 is now playing!');
-	});
-
-	dispatcher.on('finish', () => {
-		dispatcher.destroy();
-	});
-
-	// Always remember to handle errors appropriately!
-	dispatcher.on('error', console.error);
 });
 
 // Login the bot
@@ -127,3 +130,5 @@ function playLoginSound(id) {
 	];
 	return sounds.find((o) => o.id === id);
 }
+
+process.on('unhandledRejection', console.error);
