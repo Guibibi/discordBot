@@ -87,9 +87,9 @@ client.on('message', (message) => {
 client.on('voiceStateUpdate', async (oldMember, newMember) => {
 	let newUserChannel = newMember.channelID;
 	let oldUserChannel = oldMember.channelID;
-	console.log(oldUserChannel, newUserChannel);
+
 	// Check if the user has joined the Main voice channel
-	if (oldUserChannel === null && newUserChannel !== null) {
+	if (oldUserChannel === null && newUserChannel !== null && newMember.id.toString() !== '369572599107420162') {
 		// Check if this is our main channel
 		if (newMember.channelID === config.voiceid) {
 			const id = newMember.id.toString(); //User id
@@ -105,7 +105,9 @@ client.on('voiceStateUpdate', async (oldMember, newMember) => {
 		if (dispatcher === null || dispatcher === undefined) return;
 
 		dispatcher.on('start', () => {
-			console.log('audio.mp3 is now playing!');
+			let date = new Date();
+			const username = newMember.member.user.username;
+			console.log(`${username} has joined the channel ${date.toUTCString()}`);
 		});
 
 		dispatcher.on('finish', () => {
@@ -123,10 +125,11 @@ client.login(config.token).catch((err) => console.log(err));
 function playLoginSound(id) {
 	const sounds = [
 		{ id: '429092662746808331', sound: 'vincent.mp3', volume: 1 },
-		{ id: '358868084695498752', sound: 'guibibi.mp3', volume: 0.2 },
+		{ id: '358868084695498752', sound: 'guibibi.mp3', volume: 0.3 },
 		{ id: '421398629916344320', sound: 'marco.mp3', volume: 0.5 },
 		{ id: '196000503249764363', sound: 'zigun.mp3', volume: 0.5 },
-		{ id: '112576800223154176', sound: 'dje.mp3', volume: 0.5 }
+		{ id: '112576800223154176', sound: 'dje.mp3', volume: 0.5 },
+		{ id: '159398693932498944', sound: 'raph.mp3', volume: 0.5 }
 	];
 	return sounds.find((o) => o.id === id);
 }
