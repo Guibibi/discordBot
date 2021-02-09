@@ -3,6 +3,7 @@ const config = require('./config.json');
 const Discord = require('discord.js');
 const prefix = config.prefix;
 const fs = require('fs');
+require('dotenv').config()
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -120,7 +121,7 @@ client.on('voiceStateUpdate', async (oldMember, newMember) => {
 });
 
 // Login the bot
-client.login(config.token).catch((err) => console.log(err));
+client.login(process.env.TOKEN).catch((err) => console.log(err));
 
 function playLoginSound(id) {
 	const sounds = [
